@@ -1,0 +1,27 @@
+# Arduino App Lab build cache — regenerated on every build, never commit
+.cache/
+ 
+# App Lab internal metadata
+.applab/
+*.applab
+ 
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+venv/
+.venv/
+ 
+# macOS
+.DS_Store
+ 
+# Windows
+Thumbs.db
+desktop.ini
+ 
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
