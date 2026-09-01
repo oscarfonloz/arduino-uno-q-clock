@@ -1,0 +1,37 @@
+<!--
+SPDX-FileCopyrightText: Copyright (C) Arduino s.r.l. and/or its affiliated companies
+
+SPDX-License-Identifier: MPL-2.0
+-->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Smart Clock</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+  </head>
+    <!-- Add your HTML here -->
+<body style="margin:0;background:#111;color:#0f0;display:flex;
+align-items:center;justify-content:center;height:100vh;
+font-family:monospace;font-size:4vw;">
+    Loading...
+    <script>
+    fetch('/hello').then(r => r.json()).then(data => {
+      document.body.textContent = data;   // data is already a plain JS string — no .display, no JSON.stringify
+    });
+
+    // 10000 milliseconds = 10 seconds
+    setTimeout(function() {
+      location.reload();
+    }, 10000);
+    </script>
+  
+    <!--<script src="libs/socket.io.min.js"></script>
+    <script src="libs/arduino.js"></script>
+    <script src="app.js"></script>
+    -->
+  
+  </body>
+</html>

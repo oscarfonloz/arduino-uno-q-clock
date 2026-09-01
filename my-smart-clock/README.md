@@ -12,6 +12,7 @@ A real-time scrolling display for the **Arduino UNO Q** that shows the current t
 - Updates the exchange rate every 30 minutes (free API, no key required)
 - Lights one of 7 Modulino Pixels LEDs to indicate today's day of the week (Mon–Sun)
 - Timezone: **Central Time (America/Chicago)** — auto-handles CST/CDT
+- Exposes the same message through a WebUI on the local network
 
 ---
 
@@ -43,21 +44,6 @@ The Linux side handles all internet/API work. The STM32 handles all real-time di
 
 ---
 
-## Project Structure
-
-```
-my-smart-clock/
-├── sketch/
-│   └── sketch.ino          # STM32 C++ code — LED matrix + Modulino
-├── python/
-│   └── clock_exchange.py   # Linux/Python code — time + exchange rate
-├── README.md
-├── LICENSE                 # MIT
-└── .gitignore
-```
-
----
-
 ## Setup & Deployment
 
 ### 1. Libraries (install via App Lab → Sketch Libraries)
@@ -84,6 +70,35 @@ pip3 install requests
 3. Click **Run**
 
 The STM32 will show `Loading...` on the matrix until the Python side completes its handshake and sends the first display string (usually within 2–3 seconds).
+
+### 4. Display on the screen
+
+You can access the local website through http://IP:7000/ per Arduino's documentation of the WebUI brick. Where IP is the IP of your Arduino device.
+
+To use an HDMI display, I recommend the following:
+1. Disable the login screen so the device logs into the user directly at boot
+```sudo mkdir -p /etc/lightdm/lightdm.conf.d```
+```sudo tee /etc/lightdm/lightdm.conf.d/50-autologin.conf <<'EOF'```
+```[Seat:*]```
+```autologin-user=arduino```
+```autologin-user-timeout=0```
+```EOF```
+```sudo reboot```
+1. Disable the X11 monitor off settings and screensaver
+    1. ```sudo nano /etc/X11/xorg.conf.d/99-disable-dpms.conf```
+    1. Add the following: 
+    Section "ServerFlags"
+        Option "BlankTime" "0"
+        Option "StandbyTime" "0"
+        Option "SuspendTime" "0"
+        Option "OffTime" "0"
+    EndSection
+    1. ```sudo reboot```
+1. Disable the Arduino App Lab automatic launch (not needed but is less screen clutter)
+```mkdir -p ~/.config/autostart```
+```cp /etc/xdg/autostart/ArduinoAppLab.desktop ~/.config/autostart/```
+```sed -i '$a Hidden=true' ~/.config/autostart/ArduinoAppLab.desktop```
+1. Run `DISPLAY=:0 chromium --kiosk --noerrdialogs --disable-infobars http://localhost:7000/` from SSH
 
 ---
 
@@ -119,5 +134,5 @@ GET https://api.frankfurter.app/latest?from=USD&to=MXN
 ## Acknowledgements
 
 Built with [Frankfurter.app](https://www.frankfurter.app) for exchange rate data.  
-Developed on Arduino UNO Q firmware v0.55.2 / App Lab v0.5.0 (May 2026).
+Developed on Arduino UNO Q firmware v0.55.2 / App Lab v0.10.0 (August 2026).
 Developed with extensive help from Claude.

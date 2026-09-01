@@ -12,6 +12,7 @@ import requests
 from datetime import datetime
 from zoneinfo import ZoneInfo          # built-in since Python 3.9 (Debian has it)
 from arduino.app_utils import App, Bridge
+from arduino.app_bricks.web_ui import WebUI
 
 # ─── Configuration ────────────────────────────────────────────────────────────
 EXCHANGE_REFRESH_MINUTES = 30
@@ -21,7 +22,13 @@ TIMEZONE  = ZoneInfo("America/Chicago")  # Central Time — auto CST/CDT
 # ─── State ────────────────────────────────────────────────────────────────────
 exchange_rate      = None
 last_exchange_fetch = 0
+current_payload     = "Loading..."   # <-- new: what /hello returns
 
+def get_display():
+    return current_payload
+
+web_ui = WebUI()
+web_ui.expose_api("GET", "/hello", get_display)
 
 # ─── Handshake ────────────────────────────────────────────────────────────────
 def linux_started():
@@ -52,7 +59,7 @@ def build_display_string(rate_str, now):
 
 # ─── Main loop ────────────────────────────────────────────────────────────────
 def loop():
-    global exchange_rate, last_exchange_fetch
+    global exchange_rate, last_exchange_fetch, current_payload
 
     now    = datetime.now(TIMEZONE)
     now_ts = time.time()
@@ -74,9 +81,9 @@ def loop():
     # Format: "10:28 PM   |   $1 = 17.34 MXN   ;4"  (semicolon = separator)
     payload = f"{display};{day_of_week}"
     Bridge.call("setDisplay", payload)
+    current_payload = payload   # <-- replaces send_message
     print(f"Sent: {payload}")
 
     time.sleep(1)
-
 
 App.run(user_loop=loop)
