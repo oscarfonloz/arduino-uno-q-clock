@@ -77,27 +77,33 @@ You can access the local website through http://IP:7000/ per Arduino's documenta
 
 To use an HDMI display, I recommend the following:
 1. Disable the login screen so the device logs into the user directly at boot
-```sudo mkdir -p /etc/lightdm/lightdm.conf.d```
-```sudo tee /etc/lightdm/lightdm.conf.d/50-autologin.conf <<'EOF'```
-```[Seat:*]```
-```autologin-user=arduino```
-```autologin-user-timeout=0```
-```EOF```
-```sudo reboot```
+```apache
+sudo mkdir -p /etc/lightdm/lightdm.conf.d
+sudo tee /etc/lightdm/lightdm.conf.d/50-autologin.conf <<'EOF'
+[Seat:*]
+autologin-user=arduino
+autologin-user-timeout=0
+EOF
+sudo reboot
+```
 1. Disable the X11 monitor off settings and screensaver
-    1. ```sudo nano /etc/X11/xorg.conf.d/99-disable-dpms.conf```
+    1. `sudo nano /etc/X11/xorg.conf.d/99-disable-dpms.conf`
     1. Add the following: 
+    ```apache
     Section "ServerFlags"
         Option "BlankTime" "0"
         Option "StandbyTime" "0"
         Option "SuspendTime" "0"
         Option "OffTime" "0"
     EndSection
-    1. ```sudo reboot```
+    ```
+    1. `sudo reboot`
 1. Disable the Arduino App Lab automatic launch (not needed but is less screen clutter)
-```mkdir -p ~/.config/autostart```
-```cp /etc/xdg/autostart/ArduinoAppLab.desktop ~/.config/autostart/```
-```sed -i '$a Hidden=true' ~/.config/autostart/ArduinoAppLab.desktop```
+```apache
+mkdir -p ~/.config/autostart
+cp /etc/xdg/autostart/ArduinoAppLab.desktop ~/.config/autostart/
+sed -i '$a Hidden=true' ~/.config/autostart/ArduinoAppLab.desktop
+```
 1. Run `DISPLAY=:0 chromium --kiosk --noerrdialogs --disable-infobars http://localhost:7000/` from SSH
 
 ---
